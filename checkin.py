@@ -91,7 +91,7 @@ def batch_auto_checkin(file_name):
         try:
             [reservation_number, first_name, last_name, email] = line.split()
         except ValueError:
-            print(f'Could not parse line {line}')
+            print('Could not parse line ' + line)
             continue
 
         # build out notifications
