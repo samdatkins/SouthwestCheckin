@@ -1,7 +1,8 @@
-from time import sleep
-import requests
 import sys
 import uuid
+from time import sleep
+
+import requests
 
 BASE_URL = 'https://mobile.southwest.com/api/'
 CHECKIN_INTERVAL_SECONDS = 0.25
@@ -47,7 +48,7 @@ class Reservation():
                     attempts += 1
                     print(data['message'])
                     if attempts > MAX_ATTEMPTS:
-                        sys.exit("Unable to get data, killing self")
+                        return
                     sleep(CHECKIN_INTERVAL_SECONDS)
                     continue
                 return data

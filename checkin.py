@@ -52,6 +52,10 @@ def _auto_checkin(reservation_number, first_name, last_name, notify=[]):
     r = Reservation(reservation_number, first_name, last_name, notify)
     body = r.lookup_existing_reservation()
 
+    if body is None:
+        print ("Giving up on " + reservation_number)
+        return
+
     # Get our local current time
     now = datetime.utcnow().replace(tzinfo=utc)
     tomorrow = now + timedelta(days=1)
@@ -98,7 +102,9 @@ def batch_auto_checkin(file_name):
         notify = [{'mediaType': 'EMAIL', 'emailAddress': email}]
         new_threads = _auto_checkin(reservation_number,
                                     first_name, last_name, notify)
-        threads.extend(new_threads)
+
+        if new_threads is not None:
+            threads.extend(new_threads)
 
     # cleanup threads while handling Ctrl+C
     while True:
