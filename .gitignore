@@ -5,3 +5,7 @@
 htmlcov/
 coverage.xml
 .vscode/settings.json
+credentials.json
+log.txt
+token.pickle
+.vscode/launch.json
