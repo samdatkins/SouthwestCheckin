@@ -9,56 +9,67 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly', 
-          'https://www.googleapis.com/auth/drive.metadata.readonly']
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+]
 
 # The ID and range of a sample spreadsheet.
-SPREADSHEET_ID = '1BMxNlcjawgCKpyLh2uwxHwxZhJYQsIci-9gdmroKiM8'
+SPREADSHEET_ID = "1BMxNlcjawgCKpyLh2uwxHwxZhJYQsIci-9gdmroKiM8"
+
 
 def get_last_modified_date(creds):
-    drive_service = build('drive', 'v3', credentials=creds)
-    sheet_metadata = drive_service.files().get(fileId=SPREADSHEET_ID,fields='modifiedTime').execute()
-    mod_time = sheet_metadata['modifiedTime']
-    return datetime.datetime.strptime(mod_time, '%Y-%m-%dT%H:%M:%S.%fZ')
+    drive_service = build("drive", "v3", credentials=creds)
+    sheet_metadata = (
+        drive_service.files()
+        .get(fileId=SPREADSHEET_ID, fields="modifiedTime")
+        .execute()
+    )
+    mod_time = sheet_metadata["modifiedTime"]
+    return datetime.datetime.strptime(mod_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+
 
 def build_creds():
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists("token.pickle"):
+        with open("token.pickle", "rb") as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server()
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open("token.pickle", "wb") as token:
             pickle.dump(creds, token, protocol=2)
-    
+
     return creds
 
+
 def get_sheet_value_rows(creds):
-    sheets_service = build('sheets', 'v4', credentials=creds)
+    sheets_service = build("sheets", "v4", credentials=creds)
 
     # Call the Sheets API
     sheetService = sheets_service.spreadsheets()
     spreadsheet = sheetService.get(spreadsheetId=SPREADSHEET_ID).execute()
 
     values = []
-    for sheet in spreadsheet['sheets']:
-        sheetName = sheet['properties']['title']
-        result = sheetService.values().get(spreadsheetId=SPREADSHEET_ID,
-                                           range=sheetName + '!A2:D').execute()
-        new_values = result.get('values', [])
+    for sheet in spreadsheet["sheets"]:
+        sheetName = sheet["properties"]["title"]
+        result = (
+            sheetService.values()
+            .get(spreadsheetId=SPREADSHEET_ID, range=sheetName + "!A2:D")
+            .execute()
+        )
+        new_values = result.get("values", [])
         if not new_values:
-            print('No data found for ' + range)
+            print("No data found for " + range)
         else:
             values.extend(new_values)
-    
+
     return values
