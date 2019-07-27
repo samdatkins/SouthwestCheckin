@@ -6,7 +6,7 @@ import requests
 
 BASE_URL = 'https://mobile.southwest.com/api/'
 CHECKIN_INTERVAL_SECONDS = 0.25
-MAX_ATTEMPTS = 15
+MAX_ATTEMPTS = 10
 
 
 class Reservation():
@@ -69,7 +69,7 @@ class Reservation():
 
     def lookup_existing_reservation(self):
         # Find our existing record
-        return self.load_json_page(self.with_suffix("mobile-misc/v1/mobile-misc/page/view-reservation/"))
+        return self.load_json_page(self.with_suffix("mobile-air-booking/v1/mobile-air-booking/page/view-reservation/"))
 
     def get_checkin_data(self):
         return self.load_json_page(self.with_suffix("mobile-air-operations/v1/mobile-air-operations/page/check-in/"))

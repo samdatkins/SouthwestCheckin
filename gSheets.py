@@ -14,7 +14,6 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
 
 # The ID and range of a sample spreadsheet.
 SPREADSHEET_ID = '1BMxNlcjawgCKpyLh2uwxHwxZhJYQsIci-9gdmroKiM8'
-RANGE_NAMES = ['SAtkins!A2:D', 'DMartin!A2:D']
 
 def get_last_modified_date(creds):
     drive_service = build('drive', 'v3', credentials=creds)
@@ -40,21 +39,23 @@ def build_creds():
             creds = flow.run_local_server()
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            pickle.dump(creds, token, protocol=2)
     
     return creds
 
-def get_sheet_value_rows(creds, sheet_id, ranges):
+def get_sheet_value_rows(creds):
     sheets_service = build('sheets', 'v4', credentials=creds)
 
-    values = []
-    for range in RANGE_NAMES:
-        # Call the Sheets API
-        sheet = sheets_service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=sheet_id,
-                                    range=range).execute()
-        new_values = result.get('values', [])
+    # Call the Sheets API
+    sheetService = sheets_service.spreadsheets()
+    spreadsheet = sheetService.get(spreadsheetId=SPREADSHEET_ID).execute()
 
+    values = []
+    for sheet in spreadsheet['sheets']:
+        sheetName = sheet['properties']['title']
+        result = sheetService.values().get(spreadsheetId=SPREADSHEET_ID,
+                                           range=sheetName + '!A2:D').execute()
+        new_values = result.get('values', [])
         if not new_values:
             print('No data found for ' + range)
         else:

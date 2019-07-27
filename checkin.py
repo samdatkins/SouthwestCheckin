@@ -2,7 +2,7 @@
 """Southwest Checkin.
 
 Usage:
-  checkin.py SHEET_ID RANGES[-v | --verbose]
+  checkin.py [-v | --verbose]
   checkin.py (-h | --help)
   checkin.py --version
 
@@ -106,7 +106,7 @@ def _auto_checkin(reservation_number, first_name, last_name, notify=[]):
     return threads
 
 
-def batch_auto_checkin(sheet_id, ranges):
+def batch_auto_checkin():
     threads = []
 
     creds = build_creds()
@@ -117,7 +117,7 @@ def batch_auto_checkin(sheet_id, ranges):
         return
     
     try:
-        valuesRows = get_sheet_value_rows(creds, sheet_id, ranges)
+        valuesRows = get_sheet_value_rows(creds)
     except:
         my_logger.error('Failed to load from google sheets')
         return
@@ -169,14 +169,11 @@ def sleep_unless_thread_should_die(n, force_stop_thread):
 if __name__ == '__main__':
 
     arguments = docopt(__doc__, version='Southwest Checkin 0.2')
-    sheet_id = arguments['SHEET_ID']
-    ranges = arguments['RANGES']
-    split_ranges = ranges.split(',')
 
     thread = None
     try:
         while True:
-            batch_auto_checkin(sheet_id, split_ranges)
+            batch_auto_checkin()
     except KeyboardInterrupt:
         print("Ctrl+C detected, canceling checkin")
         sys.exit()
