@@ -137,7 +137,7 @@ def batch_auto_checkin():
         try:
             [reservation_number, first_name, last_name, email] = row
         except ValueError:
-            print("Could not parse line " + line)
+            print("Could not parse line " + row)
             continue
 
         # build out notifications
